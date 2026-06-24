@@ -3,9 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Hand Tracking Learning Game</title>
+<title>HandQuiz — เกมตอบคำถามด้วยนิ้วมือ</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;600;800&family=Sarabun:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;600;800;900&family=Sarabun:wght@400;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -27,7 +27,7 @@
     <div class="set-picker">
       <p class="set-label">เลือกชุดคำถาม</p>
       <div id="set-list" class="set-list">
-        <!-- ใส่โดย JS -->
+        <!-- JS renders here -->
       </div>
     </div>
 
@@ -56,18 +56,37 @@
 
   <!-- HUD บนสุด -->
   <div class="hud">
-    <div class="hud-item">
-      <span class="hud-label">คะแนน</span>
-      <span class="hud-value" id="hud-score">0</span>
+
+    <!-- Left: Score + Streak -->
+    <div class="hud-group hud-left-group">
+      <div class="hud-item hud-item-score">
+        <span class="hud-label">คะแนน</span>
+        <span class="hud-value" id="hud-score">0</span>
+      </div>
+      <div class="hud-streak" id="hud-streak" style="display:none;">
+        🔥 <span id="hud-streak-val">×1</span>
+      </div>
     </div>
+
+    <!-- Center: ชื่อชุด + Hand Tracking status -->
     <div class="hud-item hud-center">
       <span class="hud-label">ชุด</span>
       <span class="hud-value" id="hud-set-title">-</span>
+      <div class="hud-tracking-badge" id="hud-tracking-badge">
+        <span class="tracking-dot"></span>
+        <span class="tracking-text">Hand Tracking Active</span>
+      </div>
     </div>
-    <div class="hud-item">
-      <span class="hud-label">ข้อ</span>
-      <span class="hud-value" id="hud-progress">1/5</span>
+
+    <!-- Right: Progress + Exit -->
+    <div class="hud-group hud-right-group">
+      <div class="hud-item hud-item-progress">
+        <span class="hud-label">ข้อ</span>
+        <span class="hud-value hud-value-lavender" id="hud-progress">1/5</span>
+      </div>
+      <button class="btn-exit" id="btn-exit">✕ ออก</button>
     </div>
+
   </div>
 
   <!-- Timer bar -->
@@ -75,29 +94,31 @@
     <div class="timer-bar" id="timer-bar"></div>
   </div>
 
-  <!-- Webcam + Canvas layer (พื้นหลังเท่านั้น) -->
+  <!-- Webcam + Canvas layer -->
   <div class="cam-wrap">
-    <video id="webcam" autoplay playsinline muted style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;transform:scaleX(-1);"></video>
-    <canvas id="overlay-canvas" style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;transform:scaleX(-1);z-index:2;"></canvas>
+    <video id="webcam" autoplay playsinline muted
+      style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;transform:scaleX(-1);"></video>
+    <canvas id="overlay-canvas"
+      style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;transform:scaleX(-1);z-index:2;"></canvas>
 
     <!-- No camera fallback -->
-    <div class="no-cam" id="no-cam" style="display:none">
+    <div class="no-cam" id="no-cam" style="display:none;">
       <div class="no-cam-icon">📷</div>
       <div class="no-cam-title">ไม่พบกล้อง</div>
       <div class="no-cam-sub">กรุณาอนุญาตการใช้กล้อง หรือใช้แป้น A / D ในการตอบ</div>
     </div>
   </div>
 
-  <!-- โซนคำตอบ (อยู่นอก cam-wrap เพื่อให้ z-index ทำงานถูกต้อง) -->
+  <!-- Answer zones -->
   <div class="answer-zone zone-left" id="zone-left">
     <div class="zone-glow"></div>
     <div class="zone-content">
       <div class="zone-label">A</div>
-      <div class="zone-answer" id="ans-left">16</div>
+      <div class="zone-answer" id="ans-left">-</div>
       <div class="zone-progress-ring">
         <svg viewBox="0 0 56 56">
-          <circle class="ring-bg" cx="28" cy="28" r="24"/>
-          <circle class="ring-fill" id="ring-left" cx="28" cy="28" r="24"/>
+          <circle class="ring-bg" cx="28" cy="28" r="24"></circle>
+          <circle class="ring-fill" id="ring-left" cx="28" cy="28" r="24"></circle>
         </svg>
       </div>
     </div>
@@ -107,17 +128,17 @@
     <div class="zone-glow"></div>
     <div class="zone-content">
       <div class="zone-label">B</div>
-      <div class="zone-answer" id="ans-right">32</div>
+      <div class="zone-answer" id="ans-right">-</div>
       <div class="zone-progress-ring">
         <svg viewBox="0 0 56 56">
-          <circle class="ring-bg" cx="28" cy="28" r="24"/>
-          <circle class="ring-fill" id="ring-right" cx="28" cy="28" r="24"/>
+          <circle class="ring-bg" cx="28" cy="28" r="24"></circle>
+          <circle class="ring-fill" id="ring-right" cx="28" cy="28" r="24"></circle>
         </svg>
       </div>
     </div>
   </div>
 
-  <!-- คำถามตรงกลาง -->
+  <!-- Question card -->
   <div class="question-card" id="question-card">
     <div class="question-timer" id="question-timer">15</div>
     <div class="question-text" id="question-text">Loading...</div>
@@ -125,16 +146,39 @@
 
   <!-- Feedback overlay -->
   <div class="feedback-overlay" id="feedback-overlay">
-    <div class="feedback-icon" id="feedback-icon">✓</div>
-    <div class="feedback-text" id="feedback-text">ถูกต้อง!</div>
-    <div class="feedback-points" id="feedback-points">+100</div>
+    <div class="feedback-card">
+      <div class="feedback-icon" id="feedback-icon">✓</div>
+      <div class="feedback-text" id="feedback-text">ถูกต้อง!</div>
+      <div class="feedback-points" id="feedback-points">+100</div>
+    </div>
   </div>
 
-  <button class="btn-exit" id="btn-exit">✕ ออก</button>
+  <!-- Bottom hint bar -->
+  <div class="hint-bar">
+    <div class="hint-item">
+      <kbd class="hint-key">A</kbd>
+      <span>ตอบซ้าย</span>
+    </div>
+    <div class="hint-sep"></div>
+    <div class="hint-item">
+      <span>ตอบขวา</span>
+      <kbd class="hint-key">D</kbd>
+    </div>
+    <div class="hint-sep"></div>
+    <div class="hint-item">
+      <span class="hint-cam-dot"></span>
+      <span>หรือชี้มือแทนได้</span>
+    </div>
+  </div>
+
 </div>
 
 <!-- ==================== SCREEN: RESULT ==================== -->
 <div id="screen-result" class="screen">
+  <div class="result-bg-orbs">
+    <div class="result-orb result-orb1"></div>
+    <div class="result-orb result-orb2"></div>
+  </div>
   <div class="result-wrap">
     <div class="result-emoji" id="result-emoji">🎉</div>
     <h2 class="result-title">จบแล้ว!</h2>
@@ -169,7 +213,6 @@
 <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth-compat.js"></script>
 <script src="firebase-config.js"></script>
 <script src="auth.js"></script>
-
 <!-- MediaPipe CDN -->
 <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>

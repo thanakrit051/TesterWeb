@@ -270,12 +270,11 @@
 
 <!-- Firebase CDN -->
 <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth-compat.js"></script>
 <script src="firebase-config.js"></script>
 
 <script>
-  // auth มาจาก firebase-config.js แล้ว ไม่ต้องประกาศซ้ำ
+  const auth = firebase.auth();
 
   // ถ้า Login อยู่แล้ว ข้ามไป index.html เลย
   auth.onAuthStateChanged(user => {
