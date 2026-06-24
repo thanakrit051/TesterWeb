@@ -88,13 +88,16 @@ function getDefaultSets() {
 // ============================================================
 function renderSetList() {
   const list = $('set-list');
+  if (!list) return;
   list.innerHTML = '';
+  const badge = $('set-count-badge');
+  if (badge) badge.textContent = STATE.sets.length + ' ชุด';
   STATE.sets.forEach(set => {
     const card = document.createElement('div');
     card.className = 'set-card';
     card.dataset.id = set.id;
     card.innerHTML = `
-      <span>${set.title}</span>
+      <span class="set-card-title">${set.title}</span>
       <span class="set-card-count">${set.questions.length} ข้อ</span>
     `;
     card.addEventListener('click', () => selectSet(set, card));
@@ -106,15 +109,18 @@ function selectSet(set, card) {
   document.querySelectorAll('.set-card').forEach(c => c.classList.remove('selected'));
   card.classList.add('selected');
   STATE.selectedSet = set;
-  $('btn-start').disabled = false;
+  const btnStart = $('btn-start');
+  if (btnStart) btnStart.disabled = false;
 }
 
-$('btn-start').addEventListener('click', () => {
+const btnStart = $('btn-start');
+if (btnStart) btnStart.addEventListener('click', () => {
   if (!STATE.selectedSet) return;
   startGame(STATE.selectedSet);
 });
 
-$('btn-admin').addEventListener('click', () => {
+const btnAdmin = $('btn-admin');
+if (btnAdmin) btnAdmin.addEventListener('click', () => {
   window.location.href = 'admin.html';
 });
 
@@ -217,6 +223,8 @@ function updateTimerUI() {
 
 function timeOut() {
   // ไม่ตอบทันเวลา — นับเป็นผิด
+  STATE.answered = true;
+  STATE.wrong++;
   showFeedback(false, null);
 }
 
@@ -468,11 +476,11 @@ function playSound(correct) {
 // ============================================================
 function stopCamera() {
   if (STATE.mpCamera) {
-    STATE.mpCamera.stop();
+    try { STATE.mpCamera.stop(); } catch(e) { /* ignore */ }
     STATE.mpCamera = null;
   }
   const video = $('webcam');
-  if (video.srcObject) {
+  if (video && video.srcObject) {
     video.srcObject.getTracks().forEach(t => t.stop());
     video.srcObject = null;
   }
@@ -500,23 +508,27 @@ function endGame() {
 // ============================================================
 //  RESULT BUTTONS
 // ============================================================
-$('btn-retry').addEventListener('click', () => {
+const btnRetry = $('btn-retry');
+if (btnRetry) btnRetry.addEventListener('click', () => {
   if (STATE.selectedSet) startGame(STATE.selectedSet);
 });
 
-$('btn-back-menu').addEventListener('click', () => {
+const btnBackMenu = $('btn-back-menu');
+if (btnBackMenu) btnBackMenu.addEventListener('click', () => {
   showScreen('menu');
   renderSetList();
 });
 
-$('btn-exit').addEventListener('click', () => {
+const btnExit = $('btn-exit');
+if (btnExit) btnExit.addEventListener('click', () => {
   clearInterval(STATE.timerInterval);
   stopCamera();
   document.removeEventListener('keydown', handleKeyboard);
   showScreen('menu');
 });
 
-$('btn-restart').addEventListener('click', () => {
+const btnRestart = $('btn-restart');
+if (btnRestart) btnRestart.addEventListener('click', () => {
   if (!STATE.selectedSet) return;
   clearInterval(STATE.timerInterval);
   stopCamera();
