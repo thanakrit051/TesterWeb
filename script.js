@@ -151,7 +151,14 @@ function loadQuestion() {
   $('zone-right').className = 'answer-zone zone-right';
 
   // คำถาม + คำตอบ
-  $('question-text').textContent = q.question;
+  const qtEl = $('question-text');
+  qtEl.textContent = q.question;
+  // auto-shrink font ตามความยาวคำถาม
+  const len = q.question.length;
+  qtEl.style.fontSize = len > 60 ? 'clamp(14px,1.8vw,20px)'
+                      : len > 35 ? 'clamp(16px,2vw,24px)'
+                      : len > 20 ? 'clamp(18px,2.3vw,28px)'
+                      :            'clamp(20px,2.6vw,32px)';
   $('ans-left').textContent      = q.leftAnswer;
   $('ans-right').textContent     = q.rightAnswer;
 

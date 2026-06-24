@@ -525,26 +525,26 @@ html, body {
 /* Question card */
 .question-card {
   position: absolute;
-  top: 86px;
+  top: 50%;
   left: 50%;
-  transform: translateX(-50%);
+  transform: translate(-50%, -50%);
   z-index: 15;
-  width: 560px;
+  width: min(72vw, 860px);
   max-width: calc(100vw - 40px);
-  background: rgba(10,8,30,0.9);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(167,139,250,0.25);
+  background: rgba(10,8,30,0.88);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(167,139,250,0.30);
   border-radius: 24px;
-  padding: 18px 32px;
+  padding: 22px 36px;
   display: flex;
   align-items: center;
-  gap: 18px;
-  box-shadow: 0 16px 48px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.04);
+  gap: 20px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.65), 0 0 0 1px rgba(255,255,255,0.04);
   animation: floatCard 4s ease-in-out infinite, popIn 0.3s ease both;
 }
 .question-timer {
-  width: 48px; height: 48px;
+  width: 52px; height: 52px;
   flex-shrink: 0;
   background: linear-gradient(135deg, #7c3aed, #a855f7);
   border-radius: 50%;
@@ -552,7 +552,7 @@ html, body {
   align-items: center;
   justify-content: center;
   font-family: var(--font-display);
-  font-size: 20px;
+  font-size: 21px;
   font-weight: 900;
   color: #fff;
   box-shadow: 0 6px 16px rgba(124,58,237,0.5);
@@ -560,11 +560,12 @@ html, body {
 .question-text {
   flex: 1;
   font-family: var(--font-display);
-  font-size: clamp(26px, 4vw, 48px);
+  font-size: clamp(18px, 2.6vw, 32px);
   font-weight: 900;
   color: var(--white);
-  line-height: 1.1;
-  letter-spacing: -0.5px;
+  line-height: 1.25;
+  letter-spacing: -0.3px;
+  word-break: break-word;
 }
 
 /* Feedback overlay */
@@ -786,7 +787,7 @@ html, body {
    RESPONSIVE
    ============================================================ */
 @media (max-width: 1024px) {
-  .question-card { width: calc(100vw - 120px); }
+  .question-card { width: calc(100vw - 60px); padding: 16px 22px; gap: 14px; }
 }
 @media (max-width: 768px) {
   .question-card { padding: 14px 20px; gap: 12px; }
