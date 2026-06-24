@@ -298,7 +298,7 @@
     btn.disabled = true;
     const provider = new firebase.auth.GoogleAuthProvider();
     auth.signInWithPopup(provider)
-      .then(() => { window.location.href = 'index.html'; })
+      .then(() => { window.location.href = 'game.html'; })
       .catch(err => {
         btn.classList.remove('loading');
         btn.disabled = false;
@@ -316,7 +316,7 @@
     btn.disabled = true;
     btn.textContent = 'กำลังเข้าสู่ระบบ...';
     auth.signInWithEmailAndPassword(email, password)
-      .then(() => { window.location.href = 'index.html'; })
+      .then(() => { window.location.href = 'game.html'; })
       .catch(err => {
         btn.disabled = false;
         btn.textContent = 'เข้าสู่ระบบ';
@@ -337,7 +337,7 @@
     const password = document.getElementById('input-password').value;
     if (!email || !password) { showError('กรุณากรอกอีเมลและรหัสผ่าน (อย่างน้อย 6 ตัว)'); return; }
     auth.createUserWithEmailAndPassword(email, password)
-      .then(() => { window.location.href = 'index.html'; })
+      .then(() => { window.location.href = 'game.html'; })
       .catch(err => {
         const msgs = {
           'auth/email-already-in-use': 'อีเมลนี้มีบัญชีอยู่แล้ว ลองเข้าสู่ระบบ',

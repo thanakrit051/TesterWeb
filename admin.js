@@ -14,17 +14,22 @@ let saveTimer = null;
 //  LOAD / SAVE
 // ============================================================
 async function loadSets() {
-  const uid = auth.currentUser.uid;
   try {
+    const uid = auth.currentUser && auth.currentUser.uid;
+    if (!uid || !db) throw new Error('no-auth-or-db');
     const doc = await db.collection('users').doc(uid).get();
     if (doc.exists && doc.data().sets && doc.data().sets.length > 0) {
       sets = doc.data().sets;
     } else {
       // ยังไม่มีใน Firestore → โหลดจาก questions.json
-      const res  = await fetch('questions.json');
-      const data = await res.json();
-      sets = data;
-      await saveSets();
+      try {
+        const res  = await fetch('questions.json');
+        const data = await res.json();
+        sets = data;
+        await saveSets();
+      } catch {
+        sets = [];
+      }
     }
   } catch(e) {
     console.warn('Firebase error:', e);
@@ -34,8 +39,9 @@ async function loadSets() {
 }
 
 async function saveSets() {
-  const uid = auth.currentUser.uid;
   try {
+    const uid = auth.currentUser && auth.currentUser.uid;
+    if (!uid || !db) throw new Error('no-auth-or-db');
     await db.collection('users').doc(uid).set({ sets });
   } catch(e) {
     console.error('บันทึกไม่สำเร็จ:', e);

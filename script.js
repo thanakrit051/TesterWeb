@@ -47,17 +47,22 @@ function showScreen(name) {
 //  LOAD QUESTIONS
 // ============================================================
 async function loadSets() {
-  const uid = auth.currentUser.uid;
   try {
+    const uid = auth.currentUser && auth.currentUser.uid;
+    if (!uid || !db) throw new Error('no-auth-or-db');
     const doc = await db.collection('users').doc(uid).get();
     if (doc.exists && doc.data().sets && doc.data().sets.length > 0) {
       STATE.sets = doc.data().sets;
     } else {
       // ยังไม่มีข้อมูล → โหลดจาก questions.json แล้วบันทึกขึ้น
-      const res  = await fetch('questions.json');
-      const data = await res.json();
-      STATE.sets = data;
-      await db.collection('users').doc(uid).set({ sets: data });
+      try {
+        const res  = await fetch('questions.json');
+        const data = await res.json();
+        STATE.sets = data;
+        await db.collection('users').doc(uid).set({ sets: data });
+      } catch {
+        STATE.sets = getDefaultSets();
+      }
     }
   } catch(e) {
     console.warn('Firebase error, ใช้ชุดตัวอย่างแทน:', e);
@@ -116,8 +121,19 @@ $('btn-admin').addEventListener('click', () => {
 // ============================================================
 //  GAME START
 // ============================================================
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
 function startGame(set) {
-  STATE.questions  = [...set.questions];
+  let qs = [...set.questions];
+  const doShuffle = document.getElementById('toggle-shuffle');
+  if (doShuffle && doShuffle.checked) qs = shuffle(qs);
+  STATE.questions  = qs;
   STATE.currentQ   = 0;
   STATE.score      = 0;
   STATE.correct    = 0;
