@@ -41,9 +41,10 @@ html, body {
    ============================================================ */
 #screen-menu {
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   background: var(--bg);
-  overflow: hidden;
+  overflow-y: auto;
+  padding: clamp(16px, 3vh, 32px) 16px;
 }
 
 .menu-bg-orbs { position: absolute; inset: 0; pointer-events: none; }
@@ -63,23 +64,24 @@ html, body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 24px;
+  gap: clamp(12px, 2.2vh, 22px);
   width: min(520px, 92vw);
+  margin: auto;
   animation: slideUp 0.5s ease both;
 }
 
 /* Logo */
 .menu-logo { text-align: center; }
 .logo-icon {
-  font-size: 60px;
+  font-size: clamp(36px, 6vh, 56px);
   line-height: 1;
-  margin-bottom: 10px;
+  margin-bottom: 6px;
   display: block;
   filter: drop-shadow(0 8px 24px rgba(124,58,237,0.7));
 }
 .logo-title {
   font-family: var(--font-display);
-  font-size: 52px;
+  font-size: clamp(34px, 6vh, 50px);
   font-weight: 900;
   letter-spacing: -2px;
   background: linear-gradient(135deg, #c4b5fd 0%, #a78bfa 40%, #f59e0b 100%);
@@ -105,7 +107,7 @@ html, body {
   background: rgba(124,58,237,0.08);
   border: 1px solid rgba(124,58,237,0.2);
   border-radius: 16px;
-  padding: 16px 20px;
+  padding: clamp(10px, 1.6vh, 16px) 20px;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -154,7 +156,7 @@ html, body {
   color: #fff;
   border: none;
   border-radius: 14px;
-  padding: 16px 40px;
+  padding: clamp(12px, 1.8vh, 16px) 40px;
   font-family: var(--font-display);
   font-size: 20px;
   font-weight: 700;
@@ -175,7 +177,7 @@ html, body {
   color: var(--lavender);
   border: 1px solid rgba(167,139,250,0.25);
   border-radius: 12px;
-  padding: 12px 24px;
+  padding: clamp(9px, 1.4vh, 12px) 24px;
   font-family: var(--font-ui);
   font-size: 15px;
   cursor: pointer;
@@ -196,7 +198,7 @@ html, body {
   background: rgba(245,158,11,0.08);
   border: 1px solid rgba(245,158,11,0.2);
   border-radius: 12px;
-  padding: 12px 16px;
+  padding: clamp(8px, 1.2vh, 12px) 16px;
   font-size: 13px;
   color: rgba(245,158,11,0.9);
 }
@@ -407,7 +409,7 @@ html, body {
 .answer-zone {
   position: absolute;
   bottom: clamp(56px, 7vh, 86px);
-  width: clamp(140px, 17vw, 210px);
+  width: clamp(160px, 20vw, 260px);
   z-index: 10;
   pointer-events: none;
 }
@@ -436,27 +438,32 @@ html, body {
   align-items: center;
   gap: clamp(6px, 1vh, 10px);
   width: 100%;
-  background: rgba(59,130,246,0.1);
-  border: 2px solid rgba(96,165,250,0.4);
+  /* เพิ่ม opacity พื้นหลังให้มองเห็นชัดขึ้นบนกล้อง */
+  background: rgba(10,18,60,0.82);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 2px solid rgba(96,165,250,0.65);
   border-radius: 20px;
   padding: clamp(14px, 2vh, 22px) clamp(10px, 1.5vw, 18px);
-  box-shadow: 0 0 30px rgba(96,165,250,0.12), inset 0 0 20px rgba(96,165,250,0.04);
+  box-shadow: 0 0 0 1px rgba(96,165,250,0.15), 0 8px 32px rgba(0,0,0,0.55), inset 0 0 24px rgba(96,165,250,0.08);
   transition: all 0.2s ease;
   animation: zoneGlow 3s ease-in-out infinite;
 }
 .zone-right .zone-content {
-  background: rgba(124,58,237,0.12);
-  border-color: rgba(167,139,250,0.5);
-  box-shadow: 0 0 30px rgba(167,139,250,0.18), inset 0 0 20px rgba(167,139,250,0.05);
+  background: rgba(20,10,55,0.82);
+  border-color: rgba(167,139,250,0.75);
+  box-shadow: 0 0 0 1px rgba(167,139,250,0.2), 0 8px 32px rgba(0,0,0,0.55), inset 0 0 24px rgba(167,139,250,0.1);
   animation: zoneGlowRight 3s ease-in-out infinite;
 }
 .answer-zone.hovering .zone-content {
-  border-color: rgba(96,165,250,0.85);
-  box-shadow: 0 0 50px rgba(96,165,250,0.4), inset 0 0 30px rgba(96,165,250,0.1);
+  background: rgba(10,30,90,0.92);
+  border-color: rgba(96,165,250,1);
+  box-shadow: 0 0 0 2px rgba(96,165,250,0.4), 0 0 50px rgba(96,165,250,0.45), inset 0 0 30px rgba(96,165,250,0.12);
 }
 .zone-right.hovering .zone-content {
-  border-color: rgba(167,139,250,0.9);
-  box-shadow: 0 0 50px rgba(167,139,250,0.5), inset 0 0 30px rgba(167,139,250,0.12);
+  background: rgba(30,10,80,0.92);
+  border-color: rgba(167,139,250,1);
+  box-shadow: 0 0 0 2px rgba(167,139,250,0.5), 0 0 50px rgba(167,139,250,0.5), inset 0 0 30px rgba(167,139,250,0.14);
 }
 
 .zone-label {
@@ -477,13 +484,17 @@ html, body {
 }
 .zone-answer {
   font-family: var(--font-display);
-  font-size: clamp(32px, 5vw, 54px);
+  /* ปรับขนาด font อัตโนมัติตามความยาวคำตอบ */
+  font-size: clamp(20px, 3.8vw, 48px);
   font-weight: 900;
   color: var(--white);
-  text-shadow: 0 0 20px rgba(147,197,253,0.45);
-  line-height: 1;
+  text-shadow: 0 2px 12px rgba(0,0,0,0.8), 0 0 20px rgba(147,197,253,0.45);
+  line-height: 1.15;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  width: 100%;
 }
-.zone-right .zone-answer { text-shadow: 0 0 20px rgba(196,181,253,0.5); }
+.zone-right .zone-answer { text-shadow: 0 2px 12px rgba(0,0,0,0.8), 0 0 20px rgba(196,181,253,0.5); }
 .answer-zone.hovering .zone-answer  { color: #93c5fd; }
 .zone-right.hovering .zone-answer   { color: #c4b5fd; }
 
@@ -768,8 +779,8 @@ html, body {
 @keyframes popIn     { from { opacity: 0; transform: scale(0.92) translateY(10px); } to { opacity: 1; transform: scale(1) translateY(0); } }
 @keyframes feedbackIn { 0% { opacity:0; transform: scale(0.65); } 70% { transform: scale(1.05); } 100% { opacity:1; transform: scale(1); } }
 @keyframes trackingPulse { 0%,100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.5); opacity: 0.65; } }
-@keyframes zoneGlow  { 0%,100% { box-shadow: 0 0 30px rgba(96,165,250,0.12), inset 0 0 20px rgba(96,165,250,0.04); } 50% { box-shadow: 0 0 40px rgba(96,165,250,0.22), inset 0 0 25px rgba(96,165,250,0.06); } }
-@keyframes zoneGlowRight { 0%,100% { box-shadow: 0 0 30px rgba(167,139,250,0.18), inset 0 0 20px rgba(167,139,250,0.05); } 50% { box-shadow: 0 0 44px rgba(167,139,250,0.3), inset 0 0 28px rgba(167,139,250,0.08); } }
+@keyframes zoneGlow  { 0%,100% { box-shadow: 0 0 0 1px rgba(96,165,250,0.15), 0 8px 32px rgba(0,0,0,0.55), inset 0 0 24px rgba(96,165,250,0.08); } 50% { box-shadow: 0 0 0 1px rgba(96,165,250,0.25), 0 8px 36px rgba(0,0,0,0.6), inset 0 0 30px rgba(96,165,250,0.12); } }
+@keyframes zoneGlowRight { 0%,100% { box-shadow: 0 0 0 1px rgba(167,139,250,0.2), 0 8px 32px rgba(0,0,0,0.55), inset 0 0 24px rgba(167,139,250,0.1); } 50% { box-shadow: 0 0 0 1px rgba(167,139,250,0.3), 0 8px 36px rgba(0,0,0,0.6), inset 0 0 30px rgba(167,139,250,0.14); } }
 
 /* ============================================================
    RESPONSIVE

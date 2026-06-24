@@ -270,16 +270,15 @@
 
 <!-- Firebase CDN -->
 <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth-compat.js"></script>
 <script src="firebase-config.js"></script>
 
 <script>
-  // auth มาจาก firebase-config.js แล้ว ไม่ต้องประกาศซ้ำ
+  const auth = firebase.auth();
 
   // ถ้า Login อยู่แล้ว ข้ามไป index.html เลย
   auth.onAuthStateChanged(user => {
-    if (user) window.location.href = 'game.html';
+    if (user) window.location.href = 'index.html';
   });
 
   function showError(msg) {
@@ -299,7 +298,7 @@
     btn.disabled = true;
     const provider = new firebase.auth.GoogleAuthProvider();
     auth.signInWithPopup(provider)
-      .then(() => { window.location.href = 'game.html'; })
+      .then(() => { window.location.href = 'index.html'; })
       .catch(err => {
         btn.classList.remove('loading');
         btn.disabled = false;
@@ -317,7 +316,7 @@
     btn.disabled = true;
     btn.textContent = 'กำลังเข้าสู่ระบบ...';
     auth.signInWithEmailAndPassword(email, password)
-      .then(() => { window.location.href = 'game.html'; })
+      .then(() => { window.location.href = 'index.html'; })
       .catch(err => {
         btn.disabled = false;
         btn.textContent = 'เข้าสู่ระบบ';
@@ -338,7 +337,7 @@
     const password = document.getElementById('input-password').value;
     if (!email || !password) { showError('กรุณากรอกอีเมลและรหัสผ่าน (อย่างน้อย 6 ตัว)'); return; }
     auth.createUserWithEmailAndPassword(email, password)
-      .then(() => { window.location.href = 'game.html'; })
+      .then(() => { window.location.href = 'index.html'; })
       .catch(err => {
         const msgs = {
           'auth/email-already-in-use': 'อีเมลนี้มีบัญชีอยู่แล้ว ลองเข้าสู่ระบบ',
@@ -354,9 +353,10 @@
     const email = document.getElementById('input-email').value.trim();
     if (!email) { showError('กรุณากรอกอีเมลก่อน แล้วกด "ลืมรหัสผ่าน"'); return; }
     auth.sendPasswordResetEmail(email)
-      .then(() => { clearError(); alert('ส่งอีเมลรีเซ็ตรหัสผ่านแล้ว กรุณาตรวจสอบกล่องอีเมลของคุณ'); })
+      .then(() => { clearError(); alert('ส่งอีเมลรีเซ็ตรหัสผ่านแล้ว ตรวจสอบ Inbox ของคุณ'); })
       .catch(err => { showError(err.message); });
   }
 </script>
+
 </body>
 </html>
