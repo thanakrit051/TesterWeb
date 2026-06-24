@@ -1,0 +1,35 @@
+[
+  {
+    "id": "set1",
+    "title": "เลขยกกำลัง",
+    "questions": [
+      { "question": "2³ × 2² = ?", "leftAnswer": "16", "rightAnswer": "32", "correct": "right" },
+      { "question": "3² = ?", "leftAnswer": "9", "rightAnswer": "6", "correct": "left" },
+      { "question": "4² ÷ 2 = ?", "leftAnswer": "8", "rightAnswer": "6", "correct": "left" },
+      { "question": "2⁵ = ?", "leftAnswer": "25", "rightAnswer": "32", "correct": "right" },
+      { "question": "5² + 5¹ = ?", "leftAnswer": "30", "rightAnswer": "55", "correct": "left" }
+    ]
+  },
+  {
+    "id": "set2",
+    "title": "จำนวนเต็ม",
+    "questions": [
+      { "question": "(-3) × (-4) = ?", "leftAnswer": "-12", "rightAnswer": "12", "correct": "right" },
+      { "question": "(-8) + 5 = ?", "leftAnswer": "-3", "rightAnswer": "3", "correct": "left" },
+      { "question": "10 ÷ (-2) = ?", "leftAnswer": "5", "rightAnswer": "-5", "correct": "right" },
+      { "question": "(-6) - (-9) = ?", "leftAnswer": "3", "rightAnswer": "-15", "correct": "left" },
+      { "question": "|−7| = ?", "leftAnswer": "-7", "rightAnswer": "7", "correct": "right" }
+    ]
+  },
+  {
+    "id": "set3",
+    "title": "สมการเชิงเส้น",
+    "questions": [
+      { "question": "ถ้า x + 3 = 7 แล้ว x = ?", "leftAnswer": "4", "rightAnswer": "10", "correct": "left" },
+      { "question": "ถ้า 2x = 12 แล้ว x = ?", "leftAnswer": "4", "rightAnswer": "6", "correct": "right" },
+      { "question": "ถ้า x - 5 = 3 แล้ว x = ?", "leftAnswer": "8", "rightAnswer": "2", "correct": "left" },
+      { "question": "ถ้า 3x + 1 = 10 แล้ว x = ?", "leftAnswer": "3", "rightAnswer": "4", "correct": "left" },
+      { "question": "ถ้า x/2 = 6 แล้ว x = ?", "leftAnswer": "3", "rightAnswer": "12", "correct": "right" }
+    ]
+  }
+]

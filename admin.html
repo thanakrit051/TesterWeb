@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HandQuiz — จัดการคำถาม</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;600;800&family=Sarabun:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="admin.css">
+</head>
+<body class="admin-body">
+
+<div class="admin-layout">
+
+  <!-- Sidebar: รายการชุดคำถาม -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <a href="index.html" class="back-link">← กลับ</a>
+      <h1 class="sidebar-title">HandQuiz ⚙</h1>
+    </div>
+
+    <button class="btn-new-set" id="btn-new-set">+ ชุดคำถามใหม่</button>
+
+    <div class="set-sidebar-list" id="set-sidebar-list">
+      <!-- ใส่โดย JS -->
+    </div>
+
+    <div class="sidebar-footer">
+      <button class="btn-import" id="btn-import">📥 Import JSON</button>
+      <input type="file" id="file-import" accept=".json" style="display:none">
+      <div class="admin-user-bar">
+        <span class="admin-user-email" id="admin-user-email"></span>
+        <button class="btn-signout-admin" onclick="signOutUser()">ออกจากระบบ</button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main: แก้ไขชุดคำถาม -->
+  <main class="admin-main" id="admin-main">
+    <div class="empty-state" id="empty-state">
+      <div class="empty-icon">📝</div>
+      <div class="empty-title">เลือกชุดคำถามจากซ้าย</div>
+      <div class="empty-sub">หรือกด "ชุดคำถามใหม่" เพื่อสร้าง</div>
+    </div>
+
+    <!-- Editor (ซ่อนไว้ก่อน) -->
+    <div class="set-editor" id="set-editor" style="display:none">
+
+      <!-- Header ชุดคำถาม -->
+      <div class="editor-header">
+        <div class="editor-title-row">
+          <input type="text" id="set-title-input" class="set-title-input" placeholder="ชื่อชุดคำถาม..." maxlength="60">
+          <div class="editor-header-actions">
+            <button class="btn-export" id="btn-export">📤 Export</button>
+            <button class="btn-delete-set" id="btn-delete-set">🗑 ลบชุด</button>
+          </div>
+        </div>
+        <div class="editor-meta" id="editor-meta">0 ข้อ</div>
+      </div>
+
+      <!-- ตารางคำถาม -->
+      <div class="questions-table-wrap">
+        <table class="questions-table" id="questions-table">
+          <thead>
+            <tr>
+              <th class="col-num">#</th>
+              <th class="col-question">คำถาม</th>
+              <th class="col-answer">ตอบ A (ซ้าย)</th>
+              <th class="col-answer">ตอบ B (ขวา)</th>
+              <th class="col-correct">ถูกต้อง</th>
+              <th class="col-action"></th>
+            </tr>
+          </thead>
+          <tbody id="questions-tbody">
+            <!-- ใส่โดย JS -->
+          </tbody>
+        </table>
+      </div>
+
+      <button class="btn-add-q" id="btn-add-q">+ เพิ่มคำถาม</button>
+
+    </div>
+  </main>
+</div>
+
+<!-- Toast notification -->
+<div class="toast" id="toast"></div>
+
+<!-- Firebase CDN -->
+<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth-compat.js"></script>
+<script src="firebase-config.js"></script>
+<script src="auth.js"></script>
+<script src="admin.js"></script>
+</body>
+</html>
