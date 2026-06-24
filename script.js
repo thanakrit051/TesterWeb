@@ -500,6 +500,14 @@ $('btn-exit').addEventListener('click', () => {
   showScreen('menu');
 });
 
+$('btn-restart').addEventListener('click', () => {
+  if (!STATE.selectedSet) return;
+  clearInterval(STATE.timerInterval);
+  stopCamera();
+  document.removeEventListener('keydown', handleKeyboard);
+  startGame(STATE.selectedSet);
+});
+
 // ============================================================
 //  INIT — ต้อง login ก่อนถึงจะใช้งานได้
 // ============================================================
