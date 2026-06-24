@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HandQuiz — เกมตอบคำถามด้วยนิ้วมือ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;600;700;800;900&family=Sarabun:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body { font-family: 'Sarabun', sans-serif; background: #0a0a14; color: #fff; overflow-x: hidden; }
+
+  :root {
+    --bg:       #0a0a14;
+    --bg2:      #0f0c24;
+    --indigo:   #7c3aed;
+    --indigo2:  #a855f7;
+    --amber:    #f59e0b;
+    --lavender: #c4b5fd;
+    --lavender2:#a78bfa;
+    --muted:    #6b6896;
+    --success:  #10b981;
+    --danger:   #f43f5e;
+    --font-display: 'Kanit', sans-serif;
+    --font-ui:      'Sarabun', sans-serif;
+  }
+
+  /* ── Animations ── */
+  @keyframes float    { 0%,100%{transform:translateY(0) rotate(-2deg);}  50%{transform:translateY(-18px) rotate(2deg);} }
+  @keyframes floatB   { 0%,100%{transform:translateY(0);}                50%{transform:translateY(-12px);} }
+  @keyframes floatBg  { 0%,100%{transform:translateY(0) scale(1);}       50%{transform:translateY(-20px) scale(1.04);} }
+  @keyframes slideUp  { from{opacity:0;transform:translateY(32px);}      to{opacity:1;transform:translateY(0);} }
+  @keyframes handDot  { 0%,100%{transform:scale(1);opacity:1;}           50%{transform:scale(1.5);opacity:0.7;} }
+  @keyframes scanLine { 0%{top:0;opacity:0.5;}                           100%{top:100%;opacity:0;} }
+
+  /* ── Nav ── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 48px; height: 68px;
+    background: rgba(10,10,20,0.88);
+    backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+  }
+  .nav-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+  .nav-logo-icon {
+    width: 38px; height: 38px;
+    background: linear-gradient(135deg,#7c3aed,#a855f7);
+    border-radius: 10px; display: flex; align-items: center; justify-content: center;
+    font-size: 20px; box-shadow: 0 4px 12px rgba(124,58,237,0.45);
+  }
+  .nav-logo-text { font-family: var(--font-display); font-weight: 800; font-size: 20px; color: #fff; letter-spacing: -0.3px; }
+  .nav-links { display: flex; align-items: center; gap: 32px; }
+  .nav-links a { text-decoration: none; color: rgba(255,255,255,0.55); font-weight: 500; font-size: 15px; transition: color 0.15s; }
+  .nav-links a:hover { color: #c4b5fd; }
+  .nav-cta {
+    text-decoration: none;
+    background: linear-gradient(135deg,#7c3aed,#a855f7);
+    color: #fff; font-family: var(--font-display); font-weight: 600; font-size: 15px;
+    padding: 9px 22px; border-radius: 50px; box-shadow: 0 4px 14px rgba(124,58,237,0.5);
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .nav-cta:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(124,58,237,0.6); }
+
+  /* ── Hero ── */
+  .hero {
+    min-height: 100vh; display: flex; align-items: center;
+    padding: 100px 48px 60px; position: relative; overflow: hidden;
+    background: var(--bg);
+  }
+  .hero-orb1 {
+    position: absolute; top: -120px; right: -80px; width: 520px; height: 520px;
+    background: rgba(124,58,237,0.28); border-radius: 50%; filter: blur(90px);
+    pointer-events: none; animation: floatBg 9s ease-in-out infinite;
+  }
+  .hero-orb2 {
+    position: absolute; bottom: -60px; left: -80px; width: 380px; height: 380px;
+    background: rgba(168,85,247,0.2); border-radius: 50%; filter: blur(80px);
+    pointer-events: none; animation: floatBg 7s ease-in-out infinite 1s;
+  }
+  .hero-orb3 {
+    position: absolute; top: 45%; left: 35%; width: 220px; height: 220px;
+    background: rgba(245,158,11,0.12); border-radius: 50%; filter: blur(60px);
+    pointer-events: none; animation: floatBg 6s ease-in-out infinite 0.5s;
+  }
+  .hero-left {
+    flex: 1; max-width: 580px; position: relative; z-index: 1;
+    animation: slideUp 0.8s ease both;
+  }
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(124,58,237,0.15); border: 1px solid rgba(124,58,237,0.3);
+    border-radius: 50px; padding: 6px 16px; margin-bottom: 28px;
+  }
+  .hero-badge-dot {
+    width: 7px; height: 7px; background: #a78bfa; border-radius: 50%;
+    animation: handDot 1.5s ease-in-out infinite;
+  }
+  .hero-badge span { font-size: 13px; font-weight: 600; color: #c4b5fd; }
+  .hero-h1 {
+    font-family: var(--font-display); font-weight: 900;
+    font-size: clamp(48px,6vw,76px); line-height: 1.05;
+    color: #fff; letter-spacing: -1px; margin-bottom: 24px;
+  }
+  .hero-h1 .gradient-text {
+    background: linear-gradient(135deg,#c4b5fd 0%,#a78bfa 40%,#f59e0b 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  }
+  .hero-h1 .amber-text { color: #f59e0b; -webkit-text-fill-color: #f59e0b; }
+  .hero-sub { font-size: 18px; line-height: 1.8; color: rgba(255,255,255,0.6); margin-bottom: 40px; max-width: 460px; }
+  .hero-buttons { display: flex; gap: 16px; flex-wrap: wrap; }
+  .btn-primary {
+    display: inline-flex; align-items: center; gap: 10px;
+    background: linear-gradient(135deg,#7c3aed,#a855f7); color: #fff;
+    font-family: var(--font-display); font-weight: 700; font-size: 17px;
+    padding: 16px 32px; border-radius: 16px; text-decoration: none;
+    box-shadow: 0 8px 24px rgba(124,58,237,0.5); transition: transform 0.18s, box-shadow 0.18s;
+  }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 32px rgba(124,58,237,0.6); }
+  .btn-ghost {
+    display: inline-flex; align-items: center; gap: 10px;
+    background: rgba(255,255,255,0.06); color: #c4b5fd;
+    font-family: var(--font-display); font-weight: 700; font-size: 17px;
+    padding: 16px 32px; border-radius: 16px; text-decoration: none;
+    border: 1.5px solid rgba(167,139,250,0.25); transition: all 0.18s;
+  }
+  .btn-ghost:hover { background: rgba(124,58,237,0.15); border-color: rgba(167,139,250,0.5); }
+  .hero-stats {
+    display: flex; gap: 32px; margin-top: 52px; padding-top: 32px;
+    border-top: 1px solid rgba(255,255,255,0.07);
+  }
+  .hero-stat-num { font-family: var(--font-display); font-weight: 800; font-size: 28px; }
+  .hero-stat-label { font-size: 13px; color: rgba(255,255,255,0.4); margin-top: 2px; }
+  .hero-divider { width: 1px; background: rgba(255,255,255,0.08); }
+  .hero-right {
+    flex: 1; display: flex; justify-content: center; align-items: center;
+    position: relative; min-height: 520px; z-index: 1;
+  }
+
+  /* ── Game Mockup Card ── */
+  .mockup-card {
+    width: 340px; height: 460px;
+    background: linear-gradient(160deg,#1e1b4b 0%,#0f0c24 100%);
+    border: 1px solid rgba(167,139,250,0.15); border-radius: 28px;
+    box-shadow: 0 32px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.04);
+    position: relative; overflow: hidden;
+    animation: floatB 4s ease-in-out infinite;
+  }
+  .mockup-scanline {
+    position: absolute; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg,transparent,rgba(167,139,250,0.3),transparent);
+    animation: scanLine 4s linear infinite; pointer-events: none; z-index: 1;
+  }
+  .mockup-hud {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 20px 20px 12px; background: rgba(255,255,255,0.04);
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+  }
+  .mockup-hud-item {
+    border-radius: 10px; padding: 6px 12px; text-align: center;
+  }
+  .mockup-hud-item.score { background: rgba(245,158,11,0.12); border: 1px solid rgba(245,158,11,0.25); }
+  .mockup-hud-item.progress { background: rgba(167,139,250,0.12); border: 1px solid rgba(167,139,250,0.25); }
+  .mockup-hud-label { font-size: 9px; color: rgba(255,255,255,0.4); font-weight: 600; letter-spacing: 1px; }
+  .mockup-hud-value { font-family: var(--font-display); font-weight: 800; font-size: 20px; }
+  .mockup-hud-item.score .mockup-hud-value { color: #f59e0b; }
+  .mockup-hud-item.progress .mockup-hud-value { color: #a78bfa; }
+  .mockup-timer-bar { height: 4px; background: rgba(255,255,255,0.08); }
+  .mockup-timer-fill {
+    height: 100%; width: 60%;
+    background: linear-gradient(90deg,#7c3aed,#a855f7,#ec4899);
+    border-radius: 2px; box-shadow: 0 0 8px rgba(168,85,247,0.5);
+  }
+  .mockup-q-card {
+    margin: 18px 14px;
+    background: rgba(255,255,255,0.05); border: 1px solid rgba(167,139,250,0.2);
+    border-radius: 18px; padding: 18px 14px; text-align: center;
+  }
+  .mockup-q-timer {
+    width: 36px; height: 36px;
+    background: linear-gradient(135deg,#7c3aed,#a855f7); border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 12px; font-family: var(--font-display); font-weight: 800;
+    font-size: 14px; color: #fff; box-shadow: 0 4px 12px rgba(124,58,237,0.5);
+  }
+  .mockup-q-text { font-family: var(--font-display); font-weight: 700; font-size: 22px; color: #fff; }
+  .mockup-zones { display: flex; gap: 10px; padding: 0 14px; }
+  .mockup-zone {
+    flex: 1; border-radius: 16px; padding: 14px 10px; text-align: center;
+  }
+  .mockup-zone.left { background: rgba(59,130,246,0.12); border: 2px solid rgba(96,165,250,0.4); }
+  .mockup-zone.right {
+    background: rgba(124,58,237,0.2); border: 2px solid rgba(167,139,250,0.65);
+    box-shadow: 0 0 20px rgba(167,139,250,0.2);
+  }
+  .mockup-zone-label { font-size: 10px; font-weight: 700; letter-spacing: 1px; margin-bottom: 5px; }
+  .mockup-zone.left .mockup-zone-label { color: #93c5fd; }
+  .mockup-zone.right .mockup-zone-label { color: #c4b5fd; }
+  .mockup-zone-ans { font-family: var(--font-display); font-weight: 800; font-size: 24px; color: #fff; }
+  .mockup-hand { text-align: center; margin-top: 14px; font-size: 28px; animation: float 2s ease-in-out infinite; }
+  .mockup-badge {
+    position: absolute; font-family: var(--font-display); font-weight: 700; font-size: 13px;
+    padding: 8px 16px; border-radius: 50px;
+  }
+  .badge-correct {
+    top: 40px; left: 0;
+    background: linear-gradient(135deg,rgba(16,185,129,0.9),rgba(5,150,105,0.9));
+    color: #fff; border: 1px solid rgba(52,211,153,0.3);
+    box-shadow: 0 4px 16px rgba(16,185,129,0.4);
+    animation: floatB 3s ease-in-out infinite 0.5s;
+  }
+  .badge-hand {
+    bottom: 80px; right: -10px; font-size: 12px;
+    background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.12);
+    color: #fff; backdrop-filter: blur(8px); border-radius: 12px;
+    animation: floatB 3.5s ease-in-out infinite 1s;
+  }
+  .badge-streak {
+    top: 50%; left: -10px;
+    background: linear-gradient(135deg,rgba(245,158,11,0.9),rgba(251,191,36,0.9));
+    color: #1e1b4b; font-size: 12px;
+    box-shadow: 0 4px 12px rgba(245,158,11,0.4);
+    animation: floatB 2.8s ease-in-out infinite 0.2s;
+  }
+
+  /* ── Features ── */
+  .features {
+    padding: 100px 48px; background: var(--bg2); position: relative; overflow: hidden;
+  }
+  .features-orb1 {
+    position: absolute; top: 0; right: 0; width: 400px; height: 400px;
+    background: radial-gradient(circle,rgba(124,58,237,0.12),transparent 70%);
+    border-radius: 50%; pointer-events: none;
+  }
+  .features-orb2 {
+    position: absolute; bottom: 0; left: 0; width: 300px; height: 300px;
+    background: radial-gradient(circle,rgba(245,158,11,0.07),transparent 70%);
+    border-radius: 50%; pointer-events: none;
+  }
+  .section-inner { max-width: 1100px; margin: 0 auto; position: relative; }
+  .section-header { text-align: center; margin-bottom: 64px; }
+  .section-tag {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(124,58,237,0.15); border: 1px solid rgba(167,139,250,0.25);
+    border-radius: 50px; padding: 6px 18px; margin-bottom: 16px;
+  }
+  .section-tag span { font-size: 13px; font-weight: 600; color: #c4b5fd; }
+  .section-tag.light { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.12); }
+  .section-tag.light span { color: rgba(255,255,255,0.75); }
+  .section-h2 {
+    font-family: var(--font-display); font-weight: 800; font-size: 42px;
+    color: #fff; letter-spacing: -0.5px;
+  }
+  .section-sub { font-size: 17px; color: rgba(255,255,255,0.55); margin-top: 12px; }
+  .feature-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 20px; }
+  .feature-card {
+    border-radius: 24px; padding: 36px 30px; position: relative; overflow: hidden;
+    transition: transform 0.18s, background 0.18s, border-color 0.18s;
+  }
+  .feature-card:hover { transform: translateY(-3px); }
+  .feature-card.indigo { background: rgba(124,58,237,0.08); border: 1px solid rgba(124,58,237,0.2); }
+  .feature-card.indigo:hover { background: rgba(124,58,237,0.14); border-color: rgba(167,139,250,0.35); }
+  .feature-card.amber { background: rgba(245,158,11,0.07); border: 1px solid rgba(245,158,11,0.18); }
+  .feature-card.amber:hover { background: rgba(245,158,11,0.12); border-color: rgba(245,158,11,0.35); }
+  .feature-card.green { background: rgba(16,185,129,0.07); border: 1px solid rgba(16,185,129,0.18); }
+  .feature-card.green:hover { background: rgba(16,185,129,0.12); border-color: rgba(52,211,153,0.35); }
+  .feature-card.red { background: rgba(244,63,94,0.07); border: 1px solid rgba(244,63,94,0.15); }
+  .feature-card.red:hover { background: rgba(244,63,94,0.12); border-color: rgba(244,63,94,0.3); }
+  .feature-card.blue { background: rgba(59,130,246,0.07); border: 1px solid rgba(59,130,246,0.18); }
+  .feature-card.blue:hover { background: rgba(59,130,246,0.12); border-color: rgba(96,165,250,0.35); }
+  .feature-card.purple { background: rgba(168,85,247,0.07); border: 1px solid rgba(192,132,252,0.18); }
+  .feature-card.purple:hover { background: rgba(168,85,247,0.12); border-color: rgba(192,132,252,0.35); }
+  .feature-icon {
+    width: 60px; height: 60px; border-radius: 18px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 28px; margin-bottom: 24px;
+  }
+  .feature-icon.indigo { background: linear-gradient(135deg,#7c3aed,#a855f7); box-shadow: 0 8px 20px rgba(124,58,237,0.4); }
+  .feature-icon.amber  { background: linear-gradient(135deg,#f59e0b,#fbbf24); box-shadow: 0 8px 20px rgba(245,158,11,0.35); }
+  .feature-icon.green  { background: linear-gradient(135deg,#10b981,#34d399); box-shadow: 0 8px 20px rgba(16,185,129,0.35); }
+  .feature-icon.red    { background: linear-gradient(135deg,#f43f5e,#fb7185); box-shadow: 0 8px 20px rgba(244,63,94,0.3); }
+  .feature-icon.blue   { background: linear-gradient(135deg,#3b82f6,#60a5fa); box-shadow: 0 8px 20px rgba(59,130,246,0.3); }
+  .feature-icon.purple { background: linear-gradient(135deg,#a855f7,#c084fc); box-shadow: 0 8px 20px rgba(168,85,247,0.3); }
+  .feature-title { font-family: var(--font-display); font-weight: 700; font-size: 20px; color: #fff; margin-bottom: 12px; }
+  .feature-desc { font-size: 14px; line-height: 1.8; color: rgba(255,255,255,0.55); }
+
+  /* ── How It Works ── */
+  .how {
+    padding: 100px 48px;
+    background: linear-gradient(160deg,#1e1b4b 0%,#312e81 100%);
+    position: relative; overflow: hidden;
+  }
+  .how-orb1 {
+    position: absolute; top: 0; right: 0; width: 400px; height: 400px;
+    background: radial-gradient(circle,rgba(167,139,250,0.15),transparent);
+    border-radius: 50%; pointer-events: none;
+  }
+  .how-orb2 {
+    position: absolute; bottom: 0; left: 0; width: 300px; height: 300px;
+    background: radial-gradient(circle,rgba(245,158,11,0.1),transparent);
+    border-radius: 50%; pointer-events: none;
+  }
+  .steps { display: grid; grid-template-columns: repeat(3,1fr); gap: 40px; position: relative; }
+  .steps-connector {
+    position: absolute; top: 56px;
+    left: calc(16.6% + 20px); right: calc(16.6% + 20px);
+    height: 2px; background: linear-gradient(90deg,rgba(167,139,250,0.5),rgba(245,158,11,0.5));
+    pointer-events: none;
+  }
+  .step { text-align: center; position: relative; }
+  .step-icon {
+    width: 112px; height: 112px; border-radius: 28px;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 28px; position: relative; font-size: 48px;
+  }
+  .step-icon.s1 { background: linear-gradient(135deg,#7c3aed,#a855f7); box-shadow: 0 16px 40px rgba(124,58,237,0.5); }
+  .step-icon.s2 { background: linear-gradient(135deg,#f59e0b,#fbbf24); box-shadow: 0 16px 40px rgba(245,158,11,0.5); }
+  .step-icon.s3 { background: linear-gradient(135deg,#10b981,#34d399); box-shadow: 0 16px 40px rgba(16,185,129,0.5); }
+  .step-num {
+    position: absolute; top: -10px; right: -10px;
+    width: 32px; height: 32px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-display); font-weight: 800; font-size: 16px;
+  }
+  .step-num.n1 { background: #f59e0b; color: #1e1b4b; box-shadow: 0 4px 10px rgba(245,158,11,0.5); }
+  .step-num.n2 { background: #a855f7; color: #fff; box-shadow: 0 4px 10px rgba(168,85,247,0.5); }
+  .step-num.n3 { background: #f43f5e; color: #fff; box-shadow: 0 4px 10px rgba(244,63,94,0.5); }
+  .step-title { font-family: var(--font-display); font-weight: 700; font-size: 22px; color: #fff; margin-bottom: 12px; }
+  .step-desc { font-size: 14px; line-height: 1.8; color: rgba(255,255,255,0.55); }
+
+  /* ── Teacher ── */
+  .teacher { padding: 100px 48px; background: var(--bg); position: relative; overflow: hidden; }
+  .teacher-orb1 {
+    position: absolute; top: -80px; right: -80px; width: 500px; height: 500px;
+    background: radial-gradient(circle,rgba(124,58,237,0.12),transparent 70%);
+    border-radius: 50%; pointer-events: none;
+  }
+  .teacher-orb2 {
+    position: absolute; bottom: -60px; left: -60px; width: 350px; height: 350px;
+    background: radial-gradient(circle,rgba(245,158,11,0.08),transparent 70%);
+    border-radius: 50%; pointer-events: none;
+  }
+  .teacher-inner {
+    max-width: 1100px; margin: 0 auto;
+    display: flex; gap: 72px; align-items: center; position: relative;
+  }
+  .teacher-visual { flex: 1; position: relative; }
+  .result-card {
+    background: linear-gradient(160deg,#1e1b4b,#0f0c24);
+    border: 1px solid rgba(167,139,250,0.15); border-radius: 28px;
+    padding: 36px; box-shadow: 0 32px 80px rgba(0,0,0,0.5); position: relative; overflow: hidden;
+  }
+  .result-card-orb {
+    position: absolute; top: -40px; right: -40px; width: 160px; height: 160px;
+    background: radial-gradient(circle,rgba(167,139,250,0.2),transparent);
+    border-radius: 50%;
+  }
+  .result-emoji { font-size: 56px; margin-bottom: 8px; display: block; text-align: center; }
+  .result-score { font-family: var(--font-display); font-weight: 800; font-size: 48px; color: #f59e0b; text-align: center; }
+  .result-label { font-size: 14px; color: rgba(255,255,255,0.4); text-align: center; margin-top: 4px; letter-spacing: 0.05em; }
+  .result-stats { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; margin-top: 24px; }
+  .result-stat {
+    border-radius: 14px; padding: 16px; text-align: center;
+    font-family: var(--font-display); font-weight: 800; font-size: 28px;
+  }
+  .result-stat.correct { background: rgba(16,185,129,0.12); border: 1px solid rgba(16,185,129,0.25); color: #34d399; }
+  .result-stat.wrong   { background: rgba(244,63,94,0.12);   border: 1px solid rgba(244,63,94,0.25);   color: #fb7185; }
+  .result-stat.pct     { background: rgba(167,139,250,0.12); border: 1px solid rgba(167,139,250,0.25); color: #a78bfa; }
+  .result-stat-label { font-size: 12px; color: rgba(255,255,255,0.4); margin-top: 4px; font-weight: 500; font-family: var(--font-ui); }
+  .result-actions { display: flex; gap: 12px; margin-top: 16px; }
+  .result-btn-main {
+    flex: 1; background: linear-gradient(135deg,#7c3aed,#a855f7); border-radius: 12px;
+    padding: 12px; text-align: center; font-family: var(--font-display);
+    font-weight: 700; font-size: 14px; color: #fff; box-shadow: 0 4px 12px rgba(124,58,237,0.4);
+    cursor: pointer;
+  }
+  .result-btn-sec {
+    flex: 1; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 12px; padding: 12px; text-align: center;
+    font-family: var(--font-display); font-weight: 600; font-size: 14px;
+    color: rgba(255,255,255,0.45); cursor: pointer;
+  }
+  .teacher-float-badge {
+    position: absolute; top: -20px; left: -20px;
+    background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);
+    backdrop-filter: blur(12px); border-radius: 18px; padding: 14px 20px;
+    box-shadow: 0 12px 32px rgba(0,0,0,0.3); display: flex; align-items: center; gap: 10px;
+  }
+  .teacher-float-icon {
+    width: 40px; height: 40px; background: linear-gradient(135deg,#10b981,#34d399);
+    border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 18px;
+  }
+  .teacher-float-title { font-family: var(--font-display); font-weight: 700; font-size: 14px; color: #fff; }
+  .teacher-float-sub { font-size: 12px; color: rgba(255,255,255,0.4); margin-top: 1px; }
+  .teacher-copy { flex: 1; }
+  .teacher-tag {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(124,58,237,0.15); border: 1px solid rgba(167,139,250,0.25);
+    border-radius: 50px; padding: 6px 18px; margin-bottom: 20px;
+  }
+  .teacher-tag span { font-size: 13px; font-weight: 600; color: #c4b5fd; }
+  .teacher-h2 {
+    font-family: var(--font-display); font-weight: 800; font-size: 38px;
+    color: #fff; letter-spacing: -0.5px; margin-bottom: 20px;
+  }
+  .teacher-sub { font-size: 16px; line-height: 1.9; color: rgba(255,255,255,0.55); margin-bottom: 36px; }
+  .teacher-points { display: flex; flex-direction: column; gap: 20px; }
+  .teacher-point { display: flex; align-items: flex-start; gap: 16px; }
+  .teacher-point-icon {
+    width: 44px; height: 44px; flex-shrink: 0; border-radius: 12px;
+    display: flex; align-items: center; justify-content: center; font-size: 20px;
+  }
+  .teacher-point-icon.indigo { background: linear-gradient(135deg,#7c3aed,#a855f7); box-shadow: 0 4px 12px rgba(124,58,237,0.4); }
+  .teacher-point-icon.amber  { background: linear-gradient(135deg,#f59e0b,#fbbf24); box-shadow: 0 4px 12px rgba(245,158,11,0.35); }
+  .teacher-point-icon.green  { background: linear-gradient(135deg,#10b981,#34d399); box-shadow: 0 4px 12px rgba(16,185,129,0.35); }
+  .teacher-point-title { font-family: var(--font-display); font-weight: 700; font-size: 17px; color: #fff; margin-bottom: 4px; }
+  .teacher-point-desc { font-size: 14px; line-height: 1.7; color: rgba(255,255,255,0.5); }
+
+  /* ── CTA ── */
+  .cta {
+    padding: 100px 48px;
+    background: linear-gradient(135deg,#7c3aed 0%,#a855f7 50%,#ec4899 100%);
+    position: relative; overflow: hidden; text-align: center;
+  }
+  .cta-dots {
+    position: absolute; inset: 0;
+    background-image: radial-gradient(circle,rgba(255,255,255,0.06) 1px,transparent 1px);
+    background-size: 32px 32px; pointer-events: none;
+  }
+  .cta-orb {
+    position: absolute; top: -60px; left: 50%; transform: translateX(-50%);
+    width: 400px; height: 400px;
+    background: radial-gradient(circle,rgba(255,255,255,0.12),transparent 70%);
+    border-radius: 50%; pointer-events: none;
+  }
+  .cta-inner { position: relative; }
+  .cta-emoji { font-size: 72px; margin-bottom: 20px; animation: float 3s ease-in-out infinite; display: block; }
+  .cta-h2 {
+    font-family: var(--font-display); font-weight: 900;
+    font-size: clamp(36px,5vw,60px); color: #fff; letter-spacing: -1px; margin-bottom: 16px;
+  }
+  .cta-sub {
+    font-size: 18px; color: rgba(255,255,255,0.75); margin-bottom: 48px;
+    max-width: 500px; margin-left: auto; margin-right: auto; line-height: 1.7;
+  }
+  .cta-buttons { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+  .cta-btn-main {
+    display: inline-flex; align-items: center; gap: 10px;
+    background: #fff; color: #7c3aed; font-family: var(--font-display);
+    font-weight: 800; font-size: 18px; padding: 18px 40px; border-radius: 16px;
+    text-decoration: none; box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+    transition: transform 0.18s, box-shadow 0.18s;
+  }
+  .cta-btn-main:hover { transform: translateY(-2px); box-shadow: 0 12px 40px rgba(0,0,0,0.3); }
+  .cta-btn-sec {
+    display: inline-flex; align-items: center; gap: 10px;
+    background: rgba(255,255,255,0.12); color: #fff; font-family: var(--font-display);
+    font-weight: 700; font-size: 18px; padding: 18px 40px; border-radius: 16px;
+    text-decoration: none; border: 1.5px solid rgba(255,255,255,0.25);
+    backdrop-filter: blur(8px); transition: background 0.18s;
+  }
+  .cta-btn-sec:hover { background: rgba(255,255,255,0.2); }
+
+  /* ── Footer ── */
+  footer {
+    padding: 40px 48px; background: #050508;
+    display: flex; align-items: center; justify-content: space-between;
+    border-top: 1px solid rgba(255,255,255,0.06);
+  }
+  .footer-logo { display: flex; align-items: center; gap: 10px; }
+  .footer-logo-icon {
+    width: 32px; height: 32px; background: linear-gradient(135deg,#7c3aed,#a855f7);
+    border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px;
+  }
+  .footer-logo-text { font-family: var(--font-display); font-weight: 700; font-size: 16px; color: #fff; }
+  .footer-copy { font-size: 13px; color: rgba(255,255,255,0.3); }
+  .footer-links { display: flex; gap: 24px; }
+  .footer-links a { font-size: 13px; color: rgba(255,255,255,0.35); text-decoration: none; transition: color 0.15s; }
+  .footer-links a:hover { color: #c4b5fd; }
+
+  /* ── Responsive ── */
+  @media (max-width: 900px) {
+    nav { padding: 0 24px; }
+    .nav-links { display: none; }
+    .hero { flex-direction: column; padding: 100px 24px 60px; }
+    .hero-right { min-height: 400px; }
+    .feature-grid { grid-template-columns: 1fr 1fr; }
+    .steps { grid-template-columns: 1fr; }
+    .steps-connector { display: none; }
+    .teacher-inner { flex-direction: column; gap: 40px; }
+    footer { flex-direction: column; gap: 16px; text-align: center; }
+  }
+  @media (max-width: 600px) {
+    .feature-grid { grid-template-columns: 1fr; }
+    .hero { padding: 100px 20px 60px; }
+    .features, .how, .teacher, .cta { padding: 60px 24px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ===== NAV ===== -->
+<nav>
+  <a class="nav-logo" href="#">
+    <div class="nav-logo-icon">✋</div>
+    <span class="nav-logo-text">HandQuiz</span>
+  </a>
+  <div class="nav-links">
+    <a href="#features">ฟีเจอร์</a>
+    <a href="#how">วิธีใช้</a>
+    <a href="#teacher">สำหรับครู</a>
+    <a href="index.html" class="nav-cta">เริ่มใช้งาน</a>
+  </div>
+</nav>
+
+<!-- ===== HERO ===== -->
+<section class="hero">
+  <div class="hero-orb1"></div>
+  <div class="hero-orb2"></div>
+  <div class="hero-orb3"></div>
+
+  <!-- Left: Copy -->
+  <div class="hero-left">
+    <div class="hero-badge">
+      <div class="hero-badge-dot"></div>
+      <span>เทคโนโลยี Hand Tracking ล่าสุด</span>
+    </div>
+    <h1 class="hero-h1">
+      ตอบคำถาม<br>
+      <span class="gradient-text">ด้วยนิ้วมือ</span><br>
+      <span class="amber-text">สนุกกว่าเดิม</span>
+    </h1>
+    <p class="hero-sub">HandQuiz ใช้ AI ตรวจจับท่ามือแบบ Real-time ให้นักเรียนชี้นิ้วเลือกคำตอบ ไม่ต้องแตะหน้าจอ ไม่ต้องพิมพ์ ใช้ได้ทันทีในห้องเรียน</p>
+    <div class="hero-buttons">
+      <a href="index.html" class="btn-primary">▶ เริ่มเล่นเลย</a>
+      <a href="#how" class="btn-ghost">ดูวิธีใช้</a>
+    </div>
+    <div class="hero-stats">
+      <div>
+        <div class="hero-stat-num" style="color:#a78bfa;">3+</div>
+        <div class="hero-stat-label">ชุดคำถามพร้อมใช้</div>
+      </div>
+      <div class="hero-divider"></div>
+      <div>
+        <div class="hero-stat-num" style="color:#10b981;">0ms</div>
+        <div class="hero-stat-label">หน่วงเวลาการติดตาม</div>
+      </div>
+      <div class="hero-divider"></div>
+      <div>
+        <div class="hero-stat-num" style="color:#f59e0b;">100%</div>
+        <div class="hero-stat-label">ใช้ได้บน Browser</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right: Game Mockup -->
+  <div class="hero-right">
+    <div class="mockup-card">
+      <div class="mockup-scanline"></div>
+      <div class="mockup-hud">
+        <div class="mockup-hud-item score">
+          <div class="mockup-hud-label">คะแนน</div>
+          <div class="mockup-hud-value">250</div>
+        </div>
+        <div style="text-align:center;">
+          <div class="mockup-hud-label" style="font-size:9px;color:rgba(255,255,255,0.4);font-weight:600;letter-spacing:1px;">ชุด</div>
+          <div style="font-family:var(--font-display);font-weight:700;font-size:13px;color:#fff;">เลขยกกำลัง</div>
+        </div>
+        <div class="mockup-hud-item progress">
+          <div class="mockup-hud-label">ข้อ</div>
+          <div class="mockup-hud-value">3/5</div>
+        </div>
+      </div>
+      <div class="mockup-timer-bar"><div class="mockup-timer-fill"></div></div>
+      <div class="mockup-q-card">
+        <div class="mockup-q-timer">10</div>
+        <div class="mockup-q-text">2⁵ = ?</div>
+      </div>
+      <div class="mockup-zones">
+        <div class="mockup-zone left">
+          <div class="mockup-zone-label">← A</div>
+          <div class="mockup-zone-ans">25</div>
+        </div>
+        <div class="mockup-zone right">
+          <div class="mockup-zone-label">B →</div>
+          <div class="mockup-zone-ans">32</div>
+          <div style="width:28px;height:28px;border-radius:50%;border:2.5px solid #a78bfa;margin:8px auto 0;background:conic-gradient(#a78bfa 70%,rgba(167,139,250,0.15) 70%);opacity:0.8;"></div>
+        </div>
+      </div>
+      <div class="mockup-hand">☝️</div>
+    </div>
+    <div class="mockup-badge badge-correct">✓ ถูกต้อง! +100</div>
+    <div class="mockup-badge badge-hand">Hand Tracking ON ✋</div>
+    <div class="mockup-badge badge-streak">🔥 Streak x3</div>
+  </div>
+</section>
+
+<!-- ===== FEATURES ===== -->
+<section class="features" id="features">
+  <div class="features-orb1"></div>
+  <div class="features-orb2"></div>
+  <div class="section-inner">
+    <div class="section-header">
+      <div class="section-tag"><span>ทำไมต้อง HandQuiz?</span></div>
+      <h2 class="section-h2">ฟีเจอร์ที่ออกแบบมา<br>สำหรับห้องเรียน</h2>
+    </div>
+    <div class="feature-grid">
+      <div class="feature-card indigo">
+        <div class="feature-icon indigo">✋</div>
+        <h3 class="feature-title">Hand Tracking แบบ Real-time</h3>
+        <p class="feature-desc">ใช้ MediaPipe AI ตรวจจับนิ้วมือ 21 จุดอย่างแม่นยำ ตอบสนองทันทีโดยไม่ต้องแตะหน้าจอ</p>
+      </div>
+      <div class="feature-card amber">
+        <div class="feature-icon amber">📚</div>
+        <h3 class="feature-title">จัดการชุดคำถามได้เอง</h3>
+        <p class="feature-desc">สร้าง แก้ไข ลบ ชุดคำถามได้ไม่จำกัด นำเข้า/ส่งออกไฟล์ JSON รองรับทุกวิชา</p>
+      </div>
+      <div class="feature-card green">
+        <div class="feature-icon green">🏆</div>
+        <h3 class="feature-title">ระบบคะแนนและ Feedback</h3>
+        <p class="feature-desc">ให้คะแนนตาม Streak และความเร็ว แสดงผลทันทีพร้อมสถิติ ตอบถูก/ผิด/ความแม่นยำ</p>
+      </div>
+      <div class="feature-card red">
+        <div class="feature-icon red">⏱</div>
+        <h3 class="feature-title">จับเวลาแต่ละข้อ</h3>
+        <p class="feature-desc">ตั้งเวลา 15 วินาทีต่อข้อ มีแถบ Timer แบบ Visual กดดันได้ระทึก เพิ่มความสนุกในการแข่งขัน</p>
+      </div>
+      <div class="feature-card blue">
+        <div class="feature-icon blue">☁️</div>
+        <h3 class="feature-title">บันทึก Cloud ด้วย Firebase</h3>
+        <p class="feature-desc">ชุดคำถามซิงค์อัตโนมัติผ่าน Firestore ใช้ได้ทุกเครื่อง ไม่สูญหาย แม้ปิด Browser</p>
+      </div>
+      <div class="feature-card purple">
+        <div class="feature-icon purple">📷</div>
+        <h3 class="feature-title">Fallback ปุ่มคีย์บอร์ด</h3>
+        <p class="feature-desc">ไม่มีกล้องก็เล่นได้ กด A/D บนคีย์บอร์ดแทนได้ทันที ไม่มีสะดุดในการสอน</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== HOW IT WORKS ===== -->
+<section class="how" id="how">
+  <div class="how-orb1"></div>
+  <div class="how-orb2"></div>
+  <div class="section-inner">
+    <div class="section-header">
+      <div class="section-tag light"><span>3 ขั้นตอนเท่านั้น</span></div>
+      <h2 class="section-h2">ใช้งานง่ายมาก</h2>
+      <p class="section-sub">ครูพร้อมสอน นักเรียนพร้อมเล่น ใน 3 ขั้นตอน</p>
+    </div>
+    <div class="steps">
+      <div class="steps-connector"></div>
+      <div class="step">
+        <div class="step-icon s1">📝<span class="step-num n1">1</span></div>
+        <h3 class="step-title">สร้างชุดคำถาม</h3>
+        <p class="step-desc">เข้าหน้า Admin สร้างชุดคำถามพร้อมตั้งคำตอบ A/B ใส่คำถามได้ไม่จำกัด</p>
+      </div>
+      <div class="step">
+        <div class="step-icon s2">✋<span class="step-num n2">2</span></div>
+        <h3 class="step-title">เลือกชุดและเริ่มเกม</h3>
+        <p class="step-desc">เลือกชุดที่ต้องการ กด "เริ่มเกม" กล้องจะเปิดและเริ่มตรวจจับมืออัตโนมัติ</p>
+      </div>
+      <div class="step">
+        <div class="step-icon s3">🏆<span class="step-num n3">3</span></div>
+        <h3 class="step-title">ชี้มือ → รับคะแนน</h3>
+        <p class="step-desc">ชี้นิ้วไปด้านซ้ายหรือขวา ค้าง 1 วินาที ระบบให้คะแนนทันทีพร้อม Feedback</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FOR TEACHERS ===== -->
+<section class="teacher" id="teacher">
+  <div class="teacher-orb1"></div>
+  <div class="teacher-orb2"></div>
+  <div class="teacher-inner">
+    <div class="teacher-visual">
+      <div class="result-card">
+        <div class="result-card-orb"></div>
+        <span class="result-emoji">🎉</span>
+        <div class="result-score">850</div>
+        <div class="result-label">คะแนนสูงสุด</div>
+        <div class="result-stats">
+          <div class="result-stat correct"><div>4</div><div class="result-stat-label">ถูก</div></div>
+          <div class="result-stat wrong"><div>1</div><div class="result-stat-label">ผิด</div></div>
+          <div class="result-stat pct"><div>80%</div><div class="result-stat-label">แม่นยำ</div></div>
+        </div>
+        <div class="result-actions">
+          <div class="result-btn-main">เล่นอีกครั้ง</div>
+          <div class="result-btn-sec">กลับหน้าหลัก</div>
+        </div>
+      </div>
+      <div class="teacher-float-badge">
+        <div class="teacher-float-icon">⚡</div>
+        <div>
+          <div class="teacher-float-title">Quick Feedback</div>
+          <div class="teacher-float-sub">นักเรียนรู้ผลทันที</div>
+        </div>
+      </div>
+    </div>
+    <div class="teacher-copy">
+      <div class="teacher-tag"><span>สำหรับครูและอาจารย์</span></div>
+      <h2 class="teacher-h2">ทำห้องเรียน<br>ให้มีชีวิตชีวา</h2>
+      <p class="teacher-sub">HandQuiz ช่วยให้ครูสร้างบรรยากาศการเรียนรู้ที่สนุกสนาน ดึงดูดความสนใจนักเรียนด้วยเทคโนโลยี AI ไม่ต้องมีพื้นฐานด้านเทคนิค</p>
+      <div class="teacher-points">
+        <div class="teacher-point">
+          <div class="teacher-point-icon indigo">🎯</div>
+          <div>
+            <div class="teacher-point-title">เพิ่มการมีส่วนร่วม</div>
+            <div class="teacher-point-desc">นักเรียนตื่นตัวและกระตือรือร้น เพราะต้องใช้ร่างกายตอบสนอง</div>
+          </div>
+        </div>
+        <div class="teacher-point">
+          <div class="teacher-point-icon amber">⚙️</div>
+          <div>
+            <div class="teacher-point-title">ปรับแต่งได้ตามวิชา</div>
+            <div class="teacher-point-desc">สร้างชุดคำถามเองได้ไม่จำกัด รองรับทุกวิชา ทุกระดับชั้น</div>
+          </div>
+        </div>
+        <div class="teacher-point">
+          <div class="teacher-point-icon green">🌐</div>
+          <div>
+            <div class="teacher-point-title">ใช้ได้ทุก Browser</div>
+            <div class="teacher-point-desc">ไม่ต้องติดตั้งโปรแกรม เปิด Browser แล้วใช้งานได้ทันที ทุกอุปกรณ์</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== CTA ===== -->
+<section class="cta">
+  <div class="cta-dots"></div>
+  <div class="cta-orb"></div>
+  <div class="cta-inner">
+    <span class="cta-emoji">✋</span>
+    <h2 class="cta-h2">พร้อมใช้งานแล้ววันนี้</h2>
+    <p class="cta-sub">เริ่มต้นสร้างชุดคำถามแรกของคุณ ฟรี ไม่มีค่าใช้จ่าย</p>
+    <div class="cta-buttons">
+      <a href="index.html" class="cta-btn-main">▶ เริ่มเล่นเดี๋ยวนี้</a>
+      <a href="admin.html" class="cta-btn-sec">⚙️ จัดการคำถาม</a>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FOOTER ===== -->
+<footer>
+  <div class="footer-logo">
+    <div class="footer-logo-icon">✋</div>
+    <span class="footer-logo-text">HandQuiz</span>
+  </div>
+  <div class="footer-copy">สร้างด้วย MediaPipe + Firebase · ภาษาไทย</div>
+  <div class="footer-links">
+    <a href="index.html">เกมตอบคำถาม</a>
+    <a href="admin.html">จัดการคำถาม</a>
+  </div>
+</footer>
+
+</body>
+</html>
